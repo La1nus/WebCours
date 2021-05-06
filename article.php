@@ -17,6 +17,23 @@
 
 	session_start();
 
+	if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
+		if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
+			$login = $_COOKIE['login'];
+			$key = $_COOKIE['key'];
+			$result = check_user($login, $key);
+			if (!empty($result)) {
+				if ($result['is_admin'] == 't') {
+					$_SESSION['admin'] = true;
+				} else $_SESSION['admin'] = false;
+				$_SESSION['auth'] = true;
+			} else {
+				setcookie('login', null, time());
+				setcookie('key', null, time());
+			}
+		}
+	}
+
 	$id = 0;
 	$tab = 0;
 
@@ -44,7 +61,7 @@
 				$current_article = select_current($t4, $id);
 				break;
 		}
-		if (isset($current_article)) {
+		if (isset($current_article) && $current_article) {
 			$date = substr($current_article["date"], 0, 10);
 			$article = $current_article["article"];
 			$ar_name = $current_article["ar_name"];
@@ -111,8 +128,6 @@
 			</div>
 		</footer>
 	</div>
-
-	<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
 	<script src="js/app.js"></script>
 </body>
 

@@ -224,7 +224,10 @@
 	padding: 10px 30px;
 	display: inline-block;
 	background-color: #0777ac;
-	transition: all .25s ease 0s;
+	transition: background-color .25s ease 0s;
+}
+.btn:hover {
+	background: #fe9923;
 }
 
 
@@ -268,6 +271,8 @@
 	color: red;
 }
 
-.invalid {
-	border-color: red!important;
+.empty-form__error {
+	margin: 15px 0 0 0;
+	color: red;
+	font-size: 16px;
 }

@@ -13,7 +13,7 @@
 require_once 'functions.php';
 
 session_start();
-if (!empty($_SESSION['auth'])&& $_SESSION['auth'] == true) {
+if (!empty($_SESSION['auth']) && $_SESSION['auth'] == true) {
 	$host  = $_SERVER['HTTP_HOST'];
 	$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 	$extra = "index.php";
@@ -26,14 +26,17 @@ if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
 		$key = $_COOKIE['key'];
 		$result = check_user($login, $key);
 		if (!empty($result)) {
+			if ($result['is_admin']=='t') {
+				$_SESSION['admin'] = true;
+			} else $_SESSION['admin'] = false;
 			$_SESSION['auth'] = true;
 			$host  = $_SERVER['HTTP_HOST'];
 			$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 			$extra = "index.php";
 			header("Location: http://$host$uri/$extra");
 		} else {
-			setcookie('login', null, time()); 
-			setcookie('key', null, time()); 
+			setcookie('login', null, time());
+			setcookie('key', null, time());
 		}
 	}
 }
@@ -45,11 +48,13 @@ if (!empty($_POST['password']) and !empty($_POST['login'])) {
 	$user = login($login, $password);
 
 	if (!empty($user)) {
-
+		if ($user['is_admin']=='t') {
+			$_SESSION['admin'] = true;
+		} else $_SESSION['admin'] = false;
 		$key = generateSalt();
 		echo $key;
 		setcookie('login', $user['login'], time() + 60 * 60 * 24 * 30);
-		setcookie('key', $key, time() + 60 * 60 * 24 * 30); 
+		setcookie('key', $key, time() + 60 * 60 * 24 * 30);
 		set_cookie_db($login, $key);
 		$_SESSION['auth'] = true;
 		$host  = $_SERVER['HTTP_HOST'];
@@ -57,7 +62,7 @@ if (!empty($_POST['password']) and !empty($_POST['login'])) {
 		$extra = "index.php";
 		header("Location: http://$host$uri/$extra");
 	} else {
-		echo "Неверный логин или пароль";
+		$error = true;
 	}
 }
 ?>
@@ -71,6 +76,11 @@ if (!empty($_POST['password']) and !empty($_POST['login'])) {
 					</div>
 					<div class="empty-form__input"><input id="password" type="password" name="password" class=""><label for="password">Пароль</label>
 					</div>
+					<?php
+					if (isset($error)) {
+						echo '<div class="empty-form__error"> Введенные пароль или email написаны неверно </div>';
+					}
+					?>
 				</div>
 				<div class="empty-form__action">
 					<div class="empty-form__btn"><button type="submit" class="btn btn_c">Войти</button></div>

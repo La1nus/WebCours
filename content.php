@@ -16,6 +16,24 @@
 	require_once 'functions.php';
 
 	session_start();
+
+	if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
+		if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
+			$login = $_COOKIE['login'];
+			$key = $_COOKIE['key'];
+			$result = check_user($login, $key);
+			if (!empty($result)) {
+				if ($result['is_admin']=='t') {
+					$_SESSION['admin'] = true;
+				} else $_SESSION['admin'] = false;
+				$_SESSION['auth'] = true;
+			} else {
+				setcookie('login', null, time());
+				setcookie('key', null, time());
+			}
+		}
+	}
+
 	$tab = 0;
 
 	$t1 = "dsssl_xsl";
@@ -29,23 +47,23 @@
 		switch ($tab) {
 			case 1:
 				$table = select_all($t1);
-				$table_string = $t1;
+				$table_name = $t1;
 				break;
 			case 2:
 				$table = select_all($t2);
-				$table_string = $t2;
+				$table_name = $t2;
 				break;
 			case 3:
 				$table = select_all($t3);
-				$table_string = $t3;
+				$table_name = $t3;
 				break;
 			case 4:
 				$table = select_all($t4);
-				$table_string = $t4;
+				$table_name = $t4;
 				break;
 			default:
 				$table = [];
-				$table_string = "404";
+				$table_name = "404";
 				break;
 		}
 	}
@@ -101,16 +119,16 @@
 						}
 					?>
 					<?php
-					 if (!empty($_SESSION['auth']) and $_SESSION['auth']) {
+					 if (!empty($_SESSION['admin']) and $_SESSION['admin'] && $table_name!='404') {
 					?>
 					<form action="editor.php" method="post">
 						<div class="edit-form">
 							<div class="edit__btn edit-btn" id="edit">Редактировать</div>
 							<div class="edit__open open-edit">
 								<div class="open-edit__row">
-									<button class="open-edit__btn edit-btn" <?php echo "name=add_{$table_string}" ?>> Добавить статью</button>
-									<div class="open-edit__btn edit-btn" id="update_btn" <?php echo "name=update_{$table_string}" ?>> Обновить статью</div>
-									<div class="open-edit__btn edit-btn" id="delete_btn" <?php echo "name=delete_{$table_string}" ?>> Удалить статью</div>
+									<button class="open-edit__btn edit-btn" <?php echo "name=add_{$table_name}" ?>> Добавить статью</button>
+									<div class="open-edit__btn edit-btn" id="update_btn" <?php echo "name=update_{$table_name}" ?>> Обновить статью</div>
+									<div class="open-edit__btn edit-btn" id="delete_btn" <?php echo "name=delete_{$table_name}" ?>> Удалить статью</div>
 									<div class="edit-update-delete">
 										<select name="id" id="" class="edit__select">
 											<?php
@@ -119,8 +137,8 @@
 											}
 											?>
 										</select>
-										<button class="open-edit__btn edit-btn" id="update_article" <?php echo "name=update_{$table_string}" ?>> Обновить</button>
-										<button class="open-edit__btn edit-btn" id="delete_article" <?php echo "name=delete_{$table_string}" ?>> Удалить</button>
+										<button class="open-edit__btn edit-btn" id="update_article" <?php echo "name=update_{$table_name}" ?>> Обновить</button>
+										<button class="open-edit__btn edit-btn" id="delete_article" <?php echo "name=delete_{$table_name}" ?>> Удалить</button>
 									</div>
 								</div>
 							</div>
