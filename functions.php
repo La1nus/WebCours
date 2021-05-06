@@ -86,7 +86,6 @@ function generateSalt()
 	for ($i = 0; $i < $randStringLen; $i++) {
 		$randString .= $charset[mt_rand(0, strlen($charset) - 1)];
 	}
-	echo $randString;
 	return $randString;
 }
 
@@ -94,7 +93,6 @@ function check_user($login, $cookie)
 {
 	global $link;
 	$query = "SELECT * FROM " . db_name . ".users WHERE login='$login' AND cookie='$cookie'";
-	echo $query;
 	$result = mysqli_fetch_assoc(mysqli_query($link, $query));
 	return $result;
 }
