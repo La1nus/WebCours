@@ -177,7 +177,7 @@ if (isset($_POST['edit'])) {
 						<div class="edit-form__сkeditor"><label for="">Краткое описание статьи:</label> <textarea name="new_description" id="ar_txt2" cols="30" rows="10"> <?php if (isset($_POST['edit'])) {
 																																																								$ar_desc_edit = str_replace('&lt;', '&amp;lt;', $_POST['new_description']);
 																																																								$ar_desc_edit = str_replace('&gt;', '&amp;gt;', $ar_desc_edit);
-																																																								echo $ar_txt_edit;
+																																																								echo $ar_desc_edit;
 																																																							} else {
 																																																								$ar_desc = str_replace('&lt;', '&amp;lt;', $ar_desc);
 																																																								$ar_desc = str_replace('&gt;', '&amp;gt;', $ar_desc);
