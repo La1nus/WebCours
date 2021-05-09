@@ -1,18 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel="stylesheet" href="css/empty.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
-
 <?php
+session_start();
 require_once 'functions.php';
 
-session_start();
 if (!empty($_SESSION['auth']) && $_SESSION['auth'] == true) {
 	$host  = $_SERVER['HTTP_HOST'];
 	$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -26,7 +15,7 @@ if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
 		$key = $_COOKIE['key'];
 		$result = check_user($login, $key);
 		if (!empty($result)) {
-			if ($result['is_admin']=='t') {
+			if ($result['is_admin'] == 't') {
 				$_SESSION['admin'] = true;
 			} else $_SESSION['admin'] = false;
 			$_SESSION['auth'] = true;
@@ -48,11 +37,10 @@ if (!empty($_POST['password']) and !empty($_POST['login'])) {
 	$user = login($login, $password);
 
 	if (!empty($user)) {
-		if ($user['is_admin']=='t') {
+		if ($user['is_admin'] == 't') {
 			$_SESSION['admin'] = true;
 		} else $_SESSION['admin'] = false;
 		$key = generateSalt();
-		echo $key;
 		setcookie('login', $user['login'], time() + 60 * 60 * 24 * 30);
 		setcookie('key', $key, time() + 60 * 60 * 24 * 30);
 		set_cookie_db($login, $key);
@@ -66,6 +54,17 @@ if (!empty($_POST['password']) and !empty($_POST['login'])) {
 	}
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" href="css/empty.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Вход</title>
+</head>
+
 
 <body>
 	<div class="empty-layout">

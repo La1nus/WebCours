@@ -1,8 +1,123 @@
+<?php
+session_start();
+if (empty($_SESSION['admin']) || !$_SESSION['admin']) {
+	$host  = $_SERVER['HTTP_HOST'];
+	$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$extra = "index.php";
+	header("Location: http://$host$uri/$extra");
+}
+
+require_once 'functions.php';
+$zag = "";
+$but = "";
+$ar_name = "";
+$ar_txt = "";
+$ar_desc = "";
+$ar_date = "";
+$table = "";
+
+
+if (isset($_POST['add_docs']) || isset($_POST['update_docs']) || isset($_POST['delete_docs'])) {
+	$table = "docs";
+	$id = $_POST['id'];
+} elseif (isset($_POST['add_dsssl_xsl']) || isset($_POST['update_dsssl_xsl']) || isset($_POST['delete_dsssl_xsl'])) {
+	$table = "dsssl_xsl";
+	$id = $_POST['id'];
+} elseif (isset($_POST['add_css']) || isset($_POST['update_css']) || isset($_POST['delete_css'])) {
+	$table = "css";
+	$id = $_POST['id'];
+} elseif (isset($_POST['add_web_docs']) || isset($_POST['update_web_docs']) || isset($_POST['delete_web_docs'])) {
+	$table = "web_docs";
+	$id = $_POST['id'];
+} elseif (!isset($_POST['edit'])) {
+	$host  = $_SERVER['HTTP_HOST'];
+	$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$extra = "index.php";
+	header("Location: http://$host$uri/$extra");
+}
+
+if (isset($_POST['add_docs']) || isset($_POST['add_dsssl_xsl']) || isset($_POST['add_css']) || isset($_POST['add_web_docs'])) {
+	$ar_desc = "";
+	$ar_date = "";
+	$ar_name = "";
+	$ar_txt = "";
+	$zag = "Добавление статьи";
+	$but = "Добавить";
+	$action = 1;
+} else if (isset($_POST['update_docs']) || isset($_POST['update_dsssl_xsl']) || isset($_POST['update_css']) || isset($_POST['update_web_docs'])) {
+	$zag = "Редактирование статьи";
+	$but = "Сохранить";
+	$str = select_current($table, $id);
+	$ar_desc = $str["description"];
+	$ar_date = $str["date"];
+	$ar_name = $str["ar_name"];
+	$ar_txt = $str["article"];
+	$action = 2;
+} else if (isset($_POST['delete_docs']) || isset($_POST['delete_dsssl_xsl']) || isset($_POST['delete_css']) || isset($_POST['delete_web_docs'])) {
+	$zag = "Удаление статьи";
+	$but = "Удалить";
+	$str = select_current($table, $id);
+	$ar_desc = $str["description"];
+	$ar_date = $str["date"];
+	$ar_name = $str["ar_name"];
+	$ar_txt = $str["article"];
+	$action = 3;
+}
+
+if (isset($_POST['edit'])) {
+	if (empty($_POST['new_date'])) {
+		$date_error = true;
+	}
+	if (empty($_POST['new_name'])) {
+		$name_error = true;
+	}
+	if (empty($_POST['new_description'])) {
+		$description_error = true;
+	}
+	if (empty($_POST['new_article'])) {
+		$article_error = true;
+	}
+	if (!isset($date_error) && !isset($name_error) && !isset($description_error) && !isset($article_error)) {
+		$host  = $_SERVER['HTTP_HOST'];
+		$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+		$table = $_POST['table'];
+		switch ($table) {
+			case "docs":
+				$extra = 'content.php?tab=4';
+				break;
+			case "dsssl_xsl":
+				$extra = 'content.php?tab=1';
+				break;
+			case "css":
+				$extra = 'content.php?tab=2';
+				break;
+			case "web_docs":
+				$extra = 'content.php?tab=3';
+				break;
+		}
+		switch ($_POST['action']) {
+			case 1:
+				add($_POST['new_date'], $_POST['new_name'], $_POST['new_description'], $_POST['new_article'], $_POST["table"]);
+				header("Location: http://$host$uri/$extra");
+				break;
+			case 2:
+				update($_POST['new_date'], $_POST['new_name'], $_POST['new_description'], $_POST['new_article'], $_POST["table"], $_POST["id"]);
+				header("Location: http://$host$uri/$extra");
+				break;
+			case 3:
+				delete($_POST['id'], $_POST['table']);
+				header("Location: http://$host$uri/$extra");
+				break;
+		}
+	}
+}
+
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
 <head>
-	<title>Главная</title>
+	<title>Редактирование</title>
 	<meta charset="UTF-8">
 	<meta name="format-detection" content="telephone=no">
 	<link rel="stylesheet" href="css/style.css">
@@ -13,120 +128,6 @@
 	<script src="https://kit.fontawesome.com/fb87bba3af.js" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 
-	<?php
-	session_start();
-	if (empty($_SESSION['admin']) || !$_SESSION['admin']) {
-		$host  = $_SERVER['HTTP_HOST'];
-		$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-		$extra = "index.php";
-		header("Location: http://$host$uri/$extra");
-	}
-
-	require_once 'functions.php';
-	$zag = "";
-	$but = "";
-	$ar_name = "";
-	$ar_txt = "";
-	$ar_desc = "";
-	$ar_date = "";
-	$table = "";
-
-	if (isset($_POST['add_docs']) || isset($_POST['update_docs']) || isset($_POST['delete_docs'])) {
-		$table = "docs";
-		$id = $_POST['id'];
-	} elseif (isset($_POST['add_dsssl_xsl']) || isset($_POST['update_dsssl_xsl']) || isset($_POST['delete_dsssl_xsl'])) {
-		$table = "dsssl_xsl";
-		$id = $_POST['id'];
-	} elseif (isset($_POST['add_css']) || isset($_POST['update_css']) || isset($_POST['delete_css'])) {
-		$table = "css";
-		$id = $_POST['id'];
-	} elseif (isset($_POST['add_web_docs']) || isset($_POST['update_web_docs']) || isset($_POST['delete_web_docs'])) {
-		$table = "web_docs";
-		$id = $_POST['id'];
-	} elseif (!isset($_POST['edit'])) {
-		$host  = $_SERVER['HTTP_HOST'];
-		$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-		$extra = "index.php";
-		header("Location: http://$host$uri/$extra");
-	}
-
-	if (isset($_POST['add_docs']) || isset($_POST['add_dsssl_xsl']) || isset($_POST['add_css']) || isset($_POST['add_web_docs'])) {
-		$ar_desc = "";
-		$ar_date = "";
-		$ar_name = "";
-		$ar_txt = "";
-		$zag = "Добавление статьи";
-		$but = "Добавить";
-		$action = 1;
-	} else if (isset($_POST['update_docs']) || isset($_POST['update_dsssl_xsl']) || isset($_POST['update_css']) || isset($_POST['update_web_docs'])) {
-		$zag = "Редактирование статьи";
-		$but = "Сохранить";
-		$str = select_current($table, $id);
-		$ar_desc = $str["description"];
-		$ar_date = $str["date"];
-		$ar_name = $str["ar_name"];
-		$ar_txt = $str["article"];
-		$action = 2;
-	} else if (isset($_POST['delete_docs']) || isset($_POST['delete_dsssl_xsl']) || isset($_POST['delete_css']) || isset($_POST['delete_web_docs'])) {
-		$zag = "Удаление статьи";
-		$but = "Удалить";
-		$str = select_current($table, $id);
-		$ar_desc = $str["description"];
-		$ar_date = $str["date"];
-		$ar_name = $str["ar_name"];
-		$ar_txt = $str["article"];
-		$action = 3;
-	}
-
-	if (isset($_POST['edit'])) {
-		if (empty($_POST['new_date'])) {
-			$date_error = true;
-		}
-		if (empty($_POST['new_name'])) {
-			$name_error = true;
-		}
-		if (empty($_POST['new_description'])) {
-			$description_error = true;
-		}
-		if (empty($_POST['new_article'])) {
-			$article_error = true;
-		}
-		if (!isset($date_error) && !isset($name_error) && !isset($description_error) && !isset($article_error)) {
-			$host  = $_SERVER['HTTP_HOST'];
-			$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-			$table = $_POST['table'];
-			switch ($table) {
-				case "docs":
-					$extra = 'content.php?tab=4';
-					break;
-				case "dsssl_xsl":
-					$extra = 'content.php?tab=1';
-					break;
-				case "css":
-					$extra = 'content.php?tab=2';
-					break;
-				case "web_docs":
-					$extra = 'content.php?tab=3';
-					break;
-			}
-			switch ($_POST['action']) {
-				case 1:
-					add($_POST['new_date'], $_POST['new_name'], $_POST['new_description'], $_POST['new_article'], $_POST["table"]);
-					header("Location: http://$host$uri/$extra");
-					break;
-				case 2:
-					update($_POST['new_date'], $_POST['new_name'], $_POST['new_description'], $_POST['new_article'], $_POST["table"], $_POST["id"]);
-					header("Location: http://$host$uri/$extra");
-					break;
-				case 3:
-					delete($_POST['id'], $_POST['table']);
-					header("Location: http://$host$uri/$extra");
-					break;
-			}
-		}
-	}
-
-	?>
 </head>
 
 <body>
@@ -173,15 +174,31 @@
 								<?php if (isset($name_error)) echo '<span> Введите заголовок статьи </span>' ?>
 							</div>
 						</div>
-						<div class="edit-form__сkeditor"><label for="">Краткое описание статьи:</label> <textarea name="new_description" id="ar_txt2" cols="30" rows="10"> <?php if (isset($_POST['edit'])) echo $_POST['new_description'];
-																																																							else echo $ar_desc ?></textarea>
+						<div class="edit-form__сkeditor"><label for="">Краткое описание статьи:</label> <textarea name="new_description" id="ar_txt2" cols="30" rows="10"> <?php if (isset($_POST['edit'])) {
+																																																								$ar_desc_edit = str_replace('&lt;', '&amp;lt;', $_POST['new_description']);
+																																																								$ar_desc_edit = str_replace('&gt;', '&amp;gt;', $ar_desc_edit);
+																																																								echo $ar_txt_edit;
+																																																							} else {
+																																																								$ar_desc = str_replace('&lt;', '&amp;lt;', $ar_desc);
+																																																								$ar_desc = str_replace('&gt;', '&amp;gt;', $ar_desc);
+																																																								echo $ar_desc;
+																																																							}
+																																																							?></textarea>
 							<script type="text/javascript">
 								CKEDITOR.replace('ar_txt2');
 							</script>
 							<?php if (isset($description_error)) echo '<span class="ckeditor__error"> Введите краткое описание статьи </span>' ?>
 						</div>
-						<div class="edit-form__сkeditor"><label for="">Описание статьи:</label> <textarea name="new_article" id="ar_txt1" cols="30" rows="10"> <?php if (isset($_POST['edit'])) echo $_POST['new_article'];
-																																																			else echo $ar_txt ?></textarea>
+						<div class="edit-form__сkeditor"><label for="">Описание статьи:</label> <textarea name="new_article" id="ar_txt1" cols="30" rows="10"> <?php if (isset($_POST['edit'])) {
+																																																				$ar_txt_edit = str_replace('&lt;', '&amp;lt;', $_POST['new_article']);
+																																																				$ar_txt_edit = str_replace('&gt;', '&amp;gt;', $ar_txt_edit);
+																																																				echo $ar_txt_edit;
+																																																			} else {
+																																																				$ar_txt = str_replace('&lt;', '&amp;lt;', $ar_txt);
+																																																				$ar_txt = str_replace('&gt;', '&amp;gt;', $ar_txt);
+																																																				echo $ar_txt;
+																																																			}
+																																																			?></textarea>
 							<script type="text/javascript">
 								CKEDITOR.replace('ar_txt1');
 							</script>

@@ -1,8 +1,77 @@
+<?php
+session_start();
+require_once 'functions.php';
+
+
+if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
+	if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
+		$login = $_COOKIE['login'];
+		$key = $_COOKIE['key'];
+		$result = check_user($login, $key);
+		if (!empty($result)) {
+			if ($result['is_admin'] == 't') {
+				$_SESSION['admin'] = true;
+			} else $_SESSION['admin'] = false;
+			$_SESSION['auth'] = true;
+		} else {
+			setcookie('login', null, time());
+			setcookie('key', null, time());
+			$host  = $_SERVER['HTTP_HOST'];
+			$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+			$extra = "index.php";
+			header("Location: http://$host$uri/$extra");
+		}
+	} else {
+		$host  = $_SERVER['HTTP_HOST'];
+		$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+		$extra = "index.php";
+		header("Location: http://$host$uri/$extra");
+	}
+}
+
+$id = 0;
+$tab = 0;
+
+$t1 = "dsssl_xsl";
+$t2 = "css";
+$t3 = "web_docs";
+$t4 = "docs";
+
+
+if (isset($_GET['id'])) {
+	global $id;
+	$id = $_GET['id'];
+	$tab = $_GET['tab'];
+	switch ($tab) {
+		case 1:
+			$current_article = select_current($t1, $id);
+			break;
+		case 2:
+			$current_article = select_current($t2, $id);
+			break;
+		case 3:
+			$current_article = select_current($t3, $id);
+			break;
+		case 4:
+			$current_article = select_current($t4, $id);
+			break;
+	}
+	if (isset($current_article) && $current_article) {
+		$date = substr($current_article["date"], 0, 10);
+		$article = $current_article["article"];
+		$ar_name = $current_article["ar_name"];
+	}
+}
+
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
 <head>
-	<title>Главная</title>
+	<title> <?php
+				if (isset($article))
+					echo $ar_name;
+				?></title>
 	<meta charset="UTF-8">
 	<meta name="format-detection" content="telephone=no">
 	<link rel="stylesheet" href="css/style.css">
@@ -12,66 +81,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://kit.fontawesome.com/fb87bba3af.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
-
-	<?php
-	require_once 'functions.php';
-
-	session_start();
-
-	if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
-		if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
-			$login = $_COOKIE['login'];
-			$key = $_COOKIE['key'];
-			$result = check_user($login, $key);
-			if (!empty($result)) {
-				if ($result['is_admin'] == 't') {
-					$_SESSION['admin'] = true;
-				} else $_SESSION['admin'] = false;
-				$_SESSION['auth'] = true;
-			} else {
-				setcookie('login', null, time());
-				setcookie('key', null, time());
-			}
-		}
-	}
-
-	$id = 0;
-	$tab = 0;
-
-	$t1 = "dsssl_xsl";
-	$t2 = "css";
-	$t3 = "web_docs";
-	$t4 = "docs";
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+	<script>
+		hljs.highlightAll();
+	</script>
 
 
-	if (isset($_GET['id'])) {
-		global $id;
-		$id = $_GET['id'];
-		$tab = $_GET['tab'];
-		switch ($tab) {
-			case 1:
-				$current_article = select_current($t1, $id);
-				break;
-			case 2:
-				$current_article = select_current($t2, $id);
-				break;
-			case 3:
-				$current_article = select_current($t3, $id);
-				break;
-			case 4:
-				$current_article = select_current($t4, $id);
-				break;
-		}
-		if (isset($current_article) && $current_article) {
-			$date = substr($current_article["date"], 0, 10);
-			$article = $current_article["article"];
-			$ar_name = $current_article["ar_name"];
-		}
-	}
-
-	?>
 
 </head>
 

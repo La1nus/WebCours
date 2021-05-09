@@ -1,3 +1,24 @@
+<?php
+session_start();
+require_once 'functions.php';
+if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
+	if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
+		$login = $_COOKIE['login'];
+		$key = $_COOKIE['key'];
+		$result = check_user($login, $key);
+		if (!empty($result)) {
+			if ($result['is_admin'] == 't') {
+				$_SESSION['admin'] = true;
+			} else $_SESSION['admin'] = false;
+			$_SESSION['auth'] = true;
+		} else {
+			setcookie('login', null, time());
+			setcookie('key', null, time());
+		}
+	}
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -15,26 +36,7 @@
 
 </head>
 
-<?php
-require_once 'functions.php';
-session_start();
-if (empty($_SESSION['auth']) or $_SESSION['auth'] == false) {
-	if (!empty($_COOKIE['login']) and !empty($_COOKIE['key'])) {
-		$login = $_COOKIE['login'];
-		$key = $_COOKIE['key'];
-		$result = check_user($login, $key);
-		if (!empty($result)) {
-			if ($result['is_admin']=='t') {
-				$_SESSION['admin'] = true;
-			} else $_SESSION['admin'] = false;
-			$_SESSION['auth'] = true;
-		} else {
-			setcookie('login', null, time()); 
-			setcookie('key', null, time()); 
-		}
-	}
-}
-?>
+
 
 <body>
 

@@ -1,11 +1,12 @@
 
 let iconMenu = document.querySelector(".icon-menu");
+let body = document.querySelector("body");
 if (iconMenu != null) {
 	let menuBody = document.querySelector(".menu__body");
 	iconMenu.addEventListener("click", function (e) {
 		iconMenu.classList.toggle("_active");
 		menuBody.classList.toggle("_active");
-
+		body.classList.toggle("_lock");
 	});
 };
 

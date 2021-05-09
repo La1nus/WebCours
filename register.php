@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<link rel="stylesheet" href="css/empty.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
-
 <?php
-require_once 'functions.php';
-
-session_start();
+	session_start();
+	require_once 'functions.php';
 if (!empty($_SESSION['auth']) && $_SESSION['auth'] == true) {
 	$host  = $_SERVER['HTTP_HOST'];
 	$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -66,6 +54,18 @@ if (!empty($_POST['login']) && !empty($_POST['password']) && !empty($_POST['chec
 	}
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" href="css/empty.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Регистрация</title>
+</head>
+
+
 
 <body>
 	<div class="empty-layout">
