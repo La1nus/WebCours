@@ -162,7 +162,7 @@ if (isset($_POST['edit'])) {
 						<div class="add-form-open-edit__title edit-form__title"> <?php
 																									if (isset($_POST['edit'])) echo $_POST['zag'];
 																									else echo $zag; ?> </div>
-						<div class="edit-form__text add-form-open-edit__text"><label for="new_date">Дата новости :</label>
+						<div class="edit-form__text add-form-open-edit__text"><label for="new_date">Дата статьи :</label>
 							<div class="edit-form__input add-form-open-edit__input edit-form__input_news"><input type="date" name="new_date" id="new_date" class="<?php if (isset($date_error)) echo 'invalid' ?>" value="<?php if (isset($_POST['edit'])) echo $_POST['new_date'];
 																																																																							else echo $ar_date ?>">
 								<?php if (isset($date_error)) echo '<span> Введите дату статьи </span>' ?>
